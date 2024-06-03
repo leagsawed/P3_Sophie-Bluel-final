@@ -1,110 +1,61 @@
+import { createModal } from './modal.js';
+
 let storedData = null;
-let url = 'http://localhost:5678/api/works/';
 
-// Fonction asynchrone pour récupérer les données de l'API
-
-// export async function fetchGeneric(endUrl, method1, body1, headers1) {
-//   let url = 'http://localhost:5678/api/works/' + endUrl;
-
-//   const config = {
-//     method: method1,
-//     body: body1,
-//     headers: headers1,
-//   };
-
-//   try {
-//     const response = await fetch(url, config);
-//     const data = await response.json();
-
-//     if (!response.ok) {
-//       throw new Error(
-//         `HTTP error! status: ${response.status}, Message: ${data.message}`
-//       );
-//     }
-//     console.log('Success:', data);
-//     return data;
-//   } catch (error) {
-//     console.error('Fetch error:', error);
-//     throw error;
-//   }
-// }
-
-// export function fetchGeneric(endUrl, method1, headers1, body1) {
-//   let url = 'http://localhost:5678/api/works/' + endUrl;
-
-//   const config = {
-//     method: method1,
-//     headers: headers1,
-//     body: body1,
-//   };
-
-//   // Vérifiez si la méthode est 'POST'
-//   if (method1 === 'POST') {
-//     return fetch(url, config)
-//       .then((response) => {
-//         if (!response.ok) {
-//           return response.json().then((data) => {
-//             throw new Error(
-//               `HTTP error! status: ${response.status}, Message: ${data.message}`
-//             );
-//           });
-//         }
-//         return response.json();
-//       })
-//       .then((data) => {
-//         console.log('Success:', data);
-//         return data;
-//       })
-//       .catch((error) => {
-//         console.error('Fetch error:', error);
-//         throw error;
-//       });
-//   } else {
-//     return fetch(url, config) // Simplification du traitement pour d'autres méthodes
-//       .then((response) => {
-//         if (!response.ok) {
-//           return response.json().then((data) => {
-//             throw new Error(
-//               `HTTP error! status: ${response.status}, Message: ${data.message}`
-//             );
-//           });
-//         }
-//         return response.json();
-//       })
-//       .then((data) => {
-//         console.log('Success:', data);
-//         return data;
-//       })
-//       .catch((error) => {
-//         console.error('Fetch error:', error);
-//         throw error;
-//       });
-//   }
-// }
-
-export async function fetchGeneric(endUrl, method1, headers1, body1) {
-  let url = 'http://localhost:5678/api/works/' + endUrl;
-
+export async function fetchData(endUrl, method1, headers1, body1) {
+  let url = 'http://localhost:5678/api/' + endUrl;
   const config = {
     method: method1,
-    headers: new Headers(headers1),
+    headers: headers1,
     body: method1 === 'POST' ? body1 : undefined,
   };
 
-  if (method1 !== 'POST') {
-    delete config.body; // Assurez-vous de ne pas inclure body pour les GET requests
+  if (endUrl === 'users/login/') {
+    fetch(url, config)
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        } else {
+          throw new Error("Erreur d'authentification");
+        }
+      })
+      .then((data) => {
+        // if (login.email == 'sophie.bluel@test.tld' && login.password == 'S0phie')
+        if (data.token) {
+          localStorage.setItem('authToken', data.token);
+          createModal('Authentification Réussie!'); // Affiche la modale
+          setTimeout(() => {
+            window.location.href = './index.html'; // Redirige après 3 secondes
+          }, 2000);
+        } else {
+          createModal('E-mail ou mot de passe incorrect.');
+        }
+      })
+      .catch((error) => {
+        console.error('Login Failed:', error);
+        createModal('E-mail ou mot de passe incorrect. Veuillez Réessayer.');
+      });
   }
 
   try {
     const response = await fetch(url, config);
-    const data = await response.json();
+
     if (!response.ok) {
+      const errorData = await response.text();
       throw new Error(
-        `HTTP error! status: ${response.status}, Message: ${data.message}`
+        `HTTP error! status: ${response.status}, Message: ${errorData}`
       );
     }
-    console.log('Success:', data);
-    return data;
+
+    const contentType = response.headers.get('Content-Type');
+    if (contentType && contentType.includes('application/json')) {
+      const data = await response.json();
+      console.log('Success:', data);
+      return data;
+    } else {
+      console.log('No JSON content, success:', response.statusText);
+      return response.statusText;
+    }
   } catch (error) {
     console.error('Fetch error:', error);
     throw error;
@@ -114,10 +65,9 @@ export async function fetchGeneric(endUrl, method1, headers1, body1) {
 // Fonction principale pour lancer l'application
 async function main() {
   try {
-    storedData = await fetchGeneric(' ');
+    storedData = await fetchData('works/');
     if (storedData) {
       displayProjects(storedData);
-      // console.log(storedData);
     }
   } catch (error) {
     console.error('Échec du chargement des projets :', error);
@@ -164,6 +114,11 @@ function appendProjectToGallery(figure) {
 // Configuration des boutons de filtre
 function setupFilterButtons() {
   const portfolioSection = document.getElementById('portfolio');
+  if (!portfolioSection) {
+    console.error('The portfolio section is missing from the page.');
+    return;
+  }
+
   const gallery = portfolioSection.querySelector('.gallery');
   const filterMenu = document.createElement('div');
   filterMenu.className = 'filter-menu';
@@ -243,6 +198,9 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 // Initialisation de l'application
+
+// document.addEventListener('DOMContentLoaded', function () {
+// });
 setupFilterButtons();
 main();
 

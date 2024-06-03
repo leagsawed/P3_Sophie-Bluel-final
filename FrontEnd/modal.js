@@ -1,10 +1,11 @@
-//Création de la fenêtre modale
+import { storedData } from './script.js';
+import { fetchData } from './script.js';
 
 export { createModal, setupContentGalleryModal };
-import { storedData } from './script.js';
-import { fetchGeneric } from './script.js';
 
-function createModal() {
+// Crée une fenêtre modale
+
+function createModal(message) {
   const modal = document.createElement('div');
   modal.id = 'modalId';
   modal.className = 'modal';
@@ -18,11 +19,20 @@ function createModal() {
     deleteModal('modalId');
   });
 
+  const msg = document.createElement('h2');
+  msg.textContent = message;
+
+  if (message) {
+    modalContent.appendChild(msg);
+  }
+
   modal.appendChild(modalContent);
   document.body.appendChild(modal);
 
   return modal;
 }
+
+// Crée un bouton "fermer"
 
 function createCloseButton() {
   const closeBtn = document.createElement('span');
@@ -32,10 +42,14 @@ function createCloseButton() {
   return closeBtn;
 }
 
+//Permet de supprimer un élément html
+
 function deleteModal(modalId) {
   const modalToRemove = document.getElementById(modalId);
   modalToRemove.remove();
 }
+
+//Met en place la gallerie au sein de la modale
 
 function setupContentGalleryModal(data) {
   const modal = document.getElementById('modalId');
@@ -58,13 +72,15 @@ function setupContentGalleryModal(data) {
   addButton.textContent = 'Ajouter une photo';
   addButton.className = 'btn btn-primary';
   addButton.id = 'addPhotoButton';
-  galleryContainer.appendChild(addButton);
 
   addButton.addEventListener('click', () => {
     modalContent.removeChild(galleryContainer);
-    setupContentAddPhoto();
+    displayFormInModal();
   });
+  galleryContainer.appendChild(addButton);
 }
+
+// Récupère les items pour les afficher dans la gallerie
 
 function displayImagesInModal(data, container) {
   data.forEach((item) => {
@@ -87,18 +103,26 @@ function displayImagesInModal(data, container) {
   });
 }
 
+// Permet de supprimer un projet de la galerie
+
 async function deleteProject(id) {
   const headers = {
     Authorization: `Bearer ${localStorage.getItem('authToken')}`,
   };
-  await fetchGeneric(id, 'DELETE', headers);
-
-  //TODO: Rajouter message d'erreur et gestion du statut
+  try {
+    const result = await fetchData('works/' + id, 'DELETE', headers);
+    console.log('Project deleted successfully:', result);
+  } catch (error) {
+    console.error('Error deleting project:', error);
+  }
 }
 
+// Variable déclarée en globale afin de récupérer plus tard l'Url d'un projet uploadé
 let uploadedImgUrl = null;
 
-function setupContentAddPhoto() {
+// Change le contenu de la modale pour afficher le formulaire d'ajout de projet
+
+function displayFormInModal() {
   const modal = document.getElementById('modalId');
   const modalContent = modal.querySelector('.modal-content');
 
@@ -205,6 +229,8 @@ function setupContentAddPhoto() {
   submitForm(form);
 }
 
+// Remplacer l'icone générique d'image par la photo Uploadée
+
 function replaceIconByUpload(input) {
   document.getElementById(input).addEventListener('change', function (event) {
     event.preventDefault;
@@ -213,14 +239,13 @@ function replaceIconByUpload(input) {
     const maxSize = 4 * 1048576;
 
     if (file.size > maxSize) {
-      alert('Le fichier doit faire 4 Mo ou moins.');
+      createModal('Le fichier doit faire 4 Mo ou moins.');
       return;
     }
 
     uploadedImgUrl = URL.createObjectURL(file);
-    console.log(uploadedImgUrl);
     const uploadedImg = document.createElement('img');
-    uploadedImg.src = uploadedImgUrl; // Définir la source de l'image à l'URL créée
+    uploadedImg.src = uploadedImgUrl;
     uploadedImg.className = 'uploaded-img';
 
     const container = document.querySelector('.upload-container');
@@ -233,46 +258,62 @@ function replaceIconByUpload(input) {
   });
 }
 
+// Ajouter le projet au moment du clic
+
 function submitForm(form) {
   form.addEventListener('submit', function (e) {
     e.preventDefault();
-    ajoutProjet();
+    addNewProject();
   });
 }
 
-function ajoutProjet() {
-  const imageUrl = uploadedImgUrl;
-  const titre = document.getElementById('photoTitle').value;
-  const categorySelect = document.getElementById('photoCategory').value;
+// Transformer la catégorie selectionnée en categoryId
 
-  if (!inputFile || !titre) {
-    alert('Veuillez sélectionner une photo et entrer un titre.');
+function getCategoryId(categoryName) {
+  const categoryMap = {
+    Objets: 1,
+    Appartements: 2,
+    'Hôtels & Restaurants': 3,
+  };
+
+  return categoryMap[categoryName] || null;
+}
+
+// Envoyer le résultat du formulaire au Backend
+
+function addNewProject() {
+  const inputFile = document.getElementById('inputFile').files[0];
+  const titre = document.getElementById('photoTitle').value;
+  const categoryName = document.getElementById('photoCategory').value;
+
+  if (!inputFile) {
+    console.error('Fichier non sélectionné');
     return;
   }
 
-  console.log(imageUrl, titre, categorySelect);
+  if (!titre) {
+    createModal('Veuillez entrer un titre.');
+    return;
+  }
+
+  const categorySelect = getCategoryId(categoryName);
+  if (!categorySelect) {
+    console.error('Catégorie non valide');
+    return;
+  }
+
+  console.log('Fichier sélectionné : ', inputFile.name);
+  console.log('Titre : ', titre);
+  console.log('Catégorie : ', categorySelect);
 
   const formData = new FormData();
-  formData.append('image', imageUrl);
-  formData.append('titre', titre);
-  formData.append('categoryId', categorySelect);
+  formData.append('image', inputFile);
+  formData.append('title', titre);
+  formData.append('category', categorySelect);
 
   const headers = {
     Authorization: `Bearer ${localStorage.getItem('authToken')}`,
   };
 
-  // fetchGeneric(' ', 'POST', headers, formData);
-
-  fetch('http://localhost:5678/api/works', {
-    method: 'POST',
-    body: formData,
-    headers: headers,
-  })
-    .then((response) => response.json())
-    .then((result) => {
-      console.log('Success:', result);
-    })
-    .catch((error) => {
-      console.error('Error:', error);
-    });
+  fetchData('works/ ', 'POST', headers, formData);
 }
