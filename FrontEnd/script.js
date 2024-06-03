@@ -15,14 +15,23 @@ let url = 'http://localhost:5678/api/works/';
 //   }
 // }
 
-export async function fetchGeneric(endUrl, method1, headers1, body1) {
+export async function fetchGeneric(endUrl, method1, body1, headers1) {
   let url = 'http://localhost:5678/api/works/' + endUrl;
 
   const config = {
     method: method1,
-    headers: new Headers(headers1),
     body: body1,
+    headers: headers1,
   };
+
+  // await fetch(url, config)
+  //   .then((response) => response.json())
+  //   .then((result) => {
+  //     console.log('Success:', result);
+  //   })
+  //   .catch((error) => {
+  //     console.error('Error:', error);
+  //   });
 
   try {
     const response = await fetch(url, config);

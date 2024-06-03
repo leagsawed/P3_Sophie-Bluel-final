@@ -209,7 +209,6 @@ function replaceIconByUpload(input) {
   document.getElementById(input).addEventListener('change', function (event) {
     event.preventDefault;
     const file = event.target.files[0];
-    console.log(file);
     if (!file) return;
     const maxSize = 4 * 1048576;
 
@@ -218,19 +217,31 @@ function replaceIconByUpload(input) {
       return;
     }
 
-    let reader = new FileReader();
-    reader.onload = function (e) {
-      const uploadedImg = document.createElement('img');
-      uploadedImg.src = e.target.result;
-      uploadedImg.className = 'uploaded-img';
+    // let reader = new FileReader();
+    // reader.onload = function (e) {
+    //   const uploadedImg = document.createElement('img');
+    //   uploadedImg.src = e.target.result;
+    //   uploadedImg.className = 'uploaded-img';
 
-      uploadedImgUrl = e.target.result;
+    // const container = document.querySelector('.upload-container');
+    // const icon = document.querySelector('.fa-image');
+    // container.replaceChild(uploadedImg, icon);
+    // };
+    // reader.readAsDataURL(file);
 
-      const container = document.querySelector('.upload-container');
-      const icon = document.querySelector('.fa-image');
-      container.replaceChild(uploadedImg, icon);
+    uploadedImgUrl = URL.createObjectURL(file);
+    console.log(uploadedImgUrl);
+    const uploadedImg = document.createElement('img');
+    uploadedImg.src = uploadedImgUrl; // Définir la source de l'image à l'URL créée
+    uploadedImg.className = 'uploaded-img';
+
+    const container = document.querySelector('.upload-container');
+    const icon = document.querySelector('.fa-image');
+    container.replaceChild(uploadedImg, icon);
+
+    uploadedImg.onload = () => {
+      URL.revokeObjectURL(uploadedImgUrl);
     };
-    reader.readAsDataURL(file);
   });
 }
 
@@ -241,54 +252,68 @@ function submitForm(form) {
   });
 }
 
-function ajoutProjet() {
-  const image = uploadedImgUrl;
-  const titre = document.getElementById('photoTitle').value;
-  const categorySelect = document.getElementById('photoCategory').value;
-
-  const formData = new FormData();
-  formData.append('titre', titre);
-  formData.append('imageUrl', image);
-  formData.append('categoryId', categorySelect);
-  // console.log(formData);
-
-  const array = Array.from(formData.entries());
-
-  console.log(array);
-  Array.from(formData.entries()).forEach(([key, value]) => {
-    console.log(key, value);
-  });
-
-  const body = JSON.stringify(array);
-  console.log(body);
-
-  const headers = {
-    Authorization: `Bearer ${localStorage.getItem('authToken')}`,
-    'Content-Type': 'application/json',
-  };
-
-  fetchGeneric(' ', 'POST', headers, formData);
-}
-
 // function ajoutProjet() {
-//   const inputFile = document.getElementById('inputFile').files[0];
+//   const image = uploadedImgUrl;
 //   const titre = document.getElementById('photoTitle').value;
 //   const categorySelect = document.getElementById('photoCategory').value;
 
-//   if (!inputFile || !titre) {
-//     alert('Veuillez sélectionner une photo et entrer un titre.');
-//     return;
-//   }
-
 //   const formData = new FormData();
-//   formData.append('image', inputFile);
 //   formData.append('titre', titre);
+//   formData.append('imageUrl', image);
 //   formData.append('categoryId', categorySelect);
+//   // console.log(formData);
+
+//   const array = Array.from(formData.entries());
+
+//   console.log(array);
+//   Array.from(formData.entries()).forEach(([key, value]) => {
+//     console.log(key, value);
+//   });
+
+//   const body = JSON.stringify(array);
+//   console.log(body);
 
 //   const headers = {
 //     Authorization: `Bearer ${localStorage.getItem('authToken')}`,
-//     // 'Content-Type': 'application/json', // Ne définissez pas Content-Type, car FormData le gère automatiquement
+//     'Content-Type': 'application/json',
 //   };
 
-//   fetchGeneric('', 'POST', headers, formData);
+//   fetchGeneric(' ', 'POST', headers, formData);
 // }
+
+function ajoutProjet() {
+  const imageUrl = uploadedImgUrl;
+  const titre = document.getElementById('photoTitle').value;
+  const categorySelect = document.getElementById('photoCategory').value;
+
+  if (!inputFile || !titre) {
+    alert('Veuillez sélectionner une photo et entrer un titre.');
+    return;
+  }
+
+  console.log(imageUrl, titre, categorySelect);
+
+  const formData = new FormData();
+  formData.append('image', imageUrl);
+  formData.append('titre', titre);
+  formData.append('categoryId', categorySelect);
+
+  const headers = {
+    Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+  };
+
+  fetchGeneric(' ', 'POST', formData, headers);
+
+  // fetch('http://localhost:5678/api/works', {
+  //   method: 'POST',
+  //   body: formData,
+  //   headers: headers,
+  // })
+  //   .then((response) => response.json())
+  //   .then((result) => {
+  //     console.log('Success:', result);
+  //   })
+  //   .catch((error) => {
+  //     console.error('Error:', error);
+  //   });
+}
