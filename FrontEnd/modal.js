@@ -217,18 +217,6 @@ function replaceIconByUpload(input) {
       return;
     }
 
-    // let reader = new FileReader();
-    // reader.onload = function (e) {
-    //   const uploadedImg = document.createElement('img');
-    //   uploadedImg.src = e.target.result;
-    //   uploadedImg.className = 'uploaded-img';
-
-    // const container = document.querySelector('.upload-container');
-    // const icon = document.querySelector('.fa-image');
-    // container.replaceChild(uploadedImg, icon);
-    // };
-    // reader.readAsDataURL(file);
-
     uploadedImgUrl = URL.createObjectURL(file);
     console.log(uploadedImgUrl);
     const uploadedImg = document.createElement('img');
@@ -252,35 +240,6 @@ function submitForm(form) {
   });
 }
 
-// function ajoutProjet() {
-//   const image = uploadedImgUrl;
-//   const titre = document.getElementById('photoTitle').value;
-//   const categorySelect = document.getElementById('photoCategory').value;
-
-//   const formData = new FormData();
-//   formData.append('titre', titre);
-//   formData.append('imageUrl', image);
-//   formData.append('categoryId', categorySelect);
-//   // console.log(formData);
-
-//   const array = Array.from(formData.entries());
-
-//   console.log(array);
-//   Array.from(formData.entries()).forEach(([key, value]) => {
-//     console.log(key, value);
-//   });
-
-//   const body = JSON.stringify(array);
-//   console.log(body);
-
-//   const headers = {
-//     Authorization: `Bearer ${localStorage.getItem('authToken')}`,
-//     'Content-Type': 'application/json',
-//   };
-
-//   fetchGeneric(' ', 'POST', headers, formData);
-// }
-
 function ajoutProjet() {
   const imageUrl = uploadedImgUrl;
   const titre = document.getElementById('photoTitle').value;
@@ -302,18 +261,18 @@ function ajoutProjet() {
     Authorization: `Bearer ${localStorage.getItem('authToken')}`,
   };
 
-  fetchGeneric(' ', 'POST', formData, headers);
+  // fetchGeneric(' ', 'POST', headers, formData);
 
-  // fetch('http://localhost:5678/api/works', {
-  //   method: 'POST',
-  //   body: formData,
-  //   headers: headers,
-  // })
-  //   .then((response) => response.json())
-  //   .then((result) => {
-  //     console.log('Success:', result);
-  //   })
-  //   .catch((error) => {
-  //     console.error('Error:', error);
-  //   });
+  fetch('http://localhost:5678/api/works', {
+    method: 'POST',
+    body: formData,
+    headers: headers,
+  })
+    .then((response) => response.json())
+    .then((result) => {
+      console.log('Success:', result);
+    })
+    .catch((error) => {
+      console.error('Error:', error);
+    });
 }

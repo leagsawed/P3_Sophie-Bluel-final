@@ -3,35 +3,97 @@ let url = 'http://localhost:5678/api/works/';
 
 // Fonction asynchrone pour récupérer les données de l'API
 
-// async function fetchData() {
+// export async function fetchGeneric(endUrl, method1, body1, headers1) {
+//   let url = 'http://localhost:5678/api/works/' + endUrl;
+
+//   const config = {
+//     method: method1,
+//     body: body1,
+//     headers: headers1,
+//   };
+
 //   try {
-//     const response = await fetch(url);
+//     const response = await fetch(url, config);
+//     const data = await response.json();
+
 //     if (!response.ok) {
-//       throw new Error(`Erreur HTTP ! statut : ${response.status}`);
+//       throw new Error(
+//         `HTTP error! status: ${response.status}, Message: ${data.message}`
+//       );
 //     }
-//     return await response.json();
+//     console.log('Success:', data);
+//     return data;
 //   } catch (error) {
-//     console.error('Erreur lors de la récupération des données', error);
+//     console.error('Fetch error:', error);
+//     throw error;
 //   }
 // }
 
-export async function fetchGeneric(endUrl, method1, body1, headers1) {
+// export function fetchGeneric(endUrl, method1, headers1, body1) {
+//   let url = 'http://localhost:5678/api/works/' + endUrl;
+
+//   const config = {
+//     method: method1,
+//     headers: headers1,
+//     body: body1,
+//   };
+
+//   // Vérifiez si la méthode est 'POST'
+//   if (method1 === 'POST') {
+//     return fetch(url, config)
+//       .then((response) => {
+//         if (!response.ok) {
+//           return response.json().then((data) => {
+//             throw new Error(
+//               `HTTP error! status: ${response.status}, Message: ${data.message}`
+//             );
+//           });
+//         }
+//         return response.json();
+//       })
+//       .then((data) => {
+//         console.log('Success:', data);
+//         return data;
+//       })
+//       .catch((error) => {
+//         console.error('Fetch error:', error);
+//         throw error;
+//       });
+//   } else {
+//     return fetch(url, config) // Simplification du traitement pour d'autres méthodes
+//       .then((response) => {
+//         if (!response.ok) {
+//           return response.json().then((data) => {
+//             throw new Error(
+//               `HTTP error! status: ${response.status}, Message: ${data.message}`
+//             );
+//           });
+//         }
+//         return response.json();
+//       })
+//       .then((data) => {
+//         console.log('Success:', data);
+//         return data;
+//       })
+//       .catch((error) => {
+//         console.error('Fetch error:', error);
+//         throw error;
+//       });
+//   }
+// }
+
+export async function fetchGeneric(endUrl, method1, headers1, body1) {
   let url = 'http://localhost:5678/api/works/' + endUrl;
 
   const config = {
     method: method1,
-    body: body1,
-    headers: headers1,
+    headers: new Headers(headers1),
+    body: method1 === 'POST' ? body1 : undefined,
   };
 
-  // await fetch(url, config)
-  //   .then((response) => response.json())
-  //   .then((result) => {
-  //     console.log('Success:', result);
-  //   })
-  //   .catch((error) => {
-  //     console.error('Error:', error);
-  //   });
+  if (method1 !== 'POST') {
+    delete config.body; // Assurez-vous de ne pas inclure body pour les GET requests
+  }
 
   try {
     const response = await fetch(url, config);
@@ -41,6 +103,7 @@ export async function fetchGeneric(endUrl, method1, body1, headers1) {
         `HTTP error! status: ${response.status}, Message: ${data.message}`
       );
     }
+    console.log('Success:', data);
     return data;
   } catch (error) {
     console.error('Fetch error:', error);
@@ -54,7 +117,7 @@ async function main() {
     storedData = await fetchGeneric(' ');
     if (storedData) {
       displayProjects(storedData);
-      console.log(storedData);
+      // console.log(storedData);
     }
   } catch (error) {
     console.error('Échec du chargement des projets :', error);
