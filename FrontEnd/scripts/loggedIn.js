@@ -6,13 +6,14 @@ const token = localStorage.getItem('authToken');
 if (token) {
   setUpLoggedInState();
 }
-
+// mise en place de  l'état logged in
 function setUpLoggedInState() {
   const modifyButton = createModifyButton();
   wrapHeaderAndAddModifyButton(modifyButton);
   setupLogout();
 }
 
+//Création d'un div pour englober le header "Mes Projets et le bouton modifier"
 function wrapHeaderAndAddModifyButton(modifyButton) {
   const header = document.querySelector('#portfolio > h2');
   const wrapper = document.createElement('div');
@@ -22,6 +23,7 @@ function wrapHeaderAndAddModifyButton(modifyButton) {
   wrapper.appendChild(modifyButton);
 }
 
+//fonction pour se déconnecter
 function setupLogout() {
   const login = document.getElementById('login-button');
   login.innerHTML = 'logout';
@@ -30,7 +32,7 @@ function setupLogout() {
     window.location.href = '/FrontEnd/index.html';
   };
 }
-
+//comportement du bouton modifier
 function createModifyButton() {
   const button = createButtonwithIcon(
     'btn btn-modify',
@@ -45,7 +47,7 @@ function createModifyButton() {
 
   return button;
 }
-
+//Création du bouton modifier avec son icone
 function createButtonwithIcon(btnClass, iconClass, textContent) {
   const button = document.createElement('button');
   button.className = btnClass;
