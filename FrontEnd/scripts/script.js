@@ -2,6 +2,7 @@ import { createModal } from './modal.js';
 
 let storedData = null;
 
+// fonction asynchronne générique de communication avec le Backend
 export async function fetchData(endUrl, method1, headers1, body1) {
   let url = 'http://localhost:5678/api/' + endUrl;
   const config = {
@@ -10,6 +11,7 @@ export async function fetchData(endUrl, method1, headers1, body1) {
     body: method1 === 'POST' ? body1 : undefined,
   };
 
+  // comportement de la fonction si elle est appelée dans la page de login
   if (endUrl === 'users/login/') {
     fetch(url, config)
       .then((response) => {
@@ -20,12 +22,12 @@ export async function fetchData(endUrl, method1, headers1, body1) {
         }
       })
       .then((data) => {
-        // if (login.email == 'sophie.bluel@test.tld' && login.password == 'S0phie')
+        // si (login.email == 'sophie.bluel@test.tld' && login.password == 'S0phie')
         if (data.token) {
           localStorage.setItem('authToken', data.token);
-          createModal('Authentification Réussie!'); // Affiche la modale
+          createModal('Authentification Réussie!');
           setTimeout(() => {
-            window.location.href = './index.html'; // Redirige après 3 secondes
+            window.location.href = './index.html';
           }, 2000);
         } else {
           createModal('E-mail ou mot de passe incorrect.');
@@ -37,6 +39,7 @@ export async function fetchData(endUrl, method1, headers1, body1) {
       });
   }
 
+  // comportement de la fonction sur le reste du site
   try {
     const response = await fetch(url, config);
 
@@ -184,7 +187,6 @@ function filterData(data, categoryId) {
 }
 
 //Rediriger vers la section Login
-
 const loginButton = document.getElementById('login-button');
 loginButton.addEventListener('click', function () {
   window.location.href = './login.html';
@@ -198,9 +200,6 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 // Initialisation de l'application
-
-// document.addEventListener('DOMContentLoaded', function () {
-// });
 setupFilterButtons();
 main();
 

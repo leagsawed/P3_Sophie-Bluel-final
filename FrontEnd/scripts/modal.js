@@ -4,26 +4,29 @@ import { fetchData } from './script.js';
 export { createModal, setupContentGalleryModal };
 
 // Crée une fenêtre modale
-
 function createModal(message) {
   const modal = document.createElement('div');
-  modal.id = 'modalId';
   modal.className = 'modal';
-
   const modalContent = document.createElement('div');
   modalContent.className = 'modal-content';
-
   const closeBtn = createCloseButton();
   modalContent.appendChild(closeBtn);
-  closeBtn.addEventListener('click', () => {
-    deleteModal('modalId');
-  });
 
-  const msg = document.createElement('h2');
-  msg.textContent = message;
+  if (!message) {
+    modal.id = 'modalId';
 
-  if (message) {
+    closeBtn.addEventListener('click', () => {
+      deleteModal('modalId');
+    });
+  } else {
+    modal.id = 'modalPopUp';
+    const msg = document.createElement('h2');
+    msg.textContent = message;
     modalContent.appendChild(msg);
+
+    closeBtn.addEventListener('click', () => {
+      deleteModal('modalPopUp');
+    });
   }
 
   modal.appendChild(modalContent);
@@ -33,7 +36,6 @@ function createModal(message) {
 }
 
 // Crée un bouton "fermer"
-
 function createCloseButton() {
   const closeBtn = document.createElement('span');
   closeBtn.className = 'close';
@@ -43,14 +45,12 @@ function createCloseButton() {
 }
 
 //Permet de supprimer un élément html
-
 function deleteModal(modalId) {
   const modalToRemove = document.getElementById(modalId);
   modalToRemove.remove();
 }
 
 //Met en place la gallerie au sein de la modale
-
 function setupContentGalleryModal(data) {
   const modal = document.getElementById('modalId');
   const modalContent = modal.querySelector('.modal-content');
@@ -81,7 +81,6 @@ function setupContentGalleryModal(data) {
 }
 
 // Récupère les items pour les afficher dans la gallerie
-
 function displayImagesInModal(data, container) {
   data.forEach((item) => {
     const imgWrapper = document.createElement('div');
@@ -104,7 +103,6 @@ function displayImagesInModal(data, container) {
 }
 
 // Permet de supprimer un projet de la galerie
-
 async function deleteProject(id) {
   const headers = {
     Authorization: `Bearer ${localStorage.getItem('authToken')}`,
@@ -121,7 +119,6 @@ async function deleteProject(id) {
 let uploadedImgUrl = null;
 
 // Change le contenu de la modale pour afficher le formulaire d'ajout de projet
-
 function displayFormInModal() {
   const modal = document.getElementById('modalId');
   const modalContent = modal.querySelector('.modal-content');
@@ -230,7 +227,6 @@ function displayFormInModal() {
 }
 
 // Remplacer l'icone générique d'image par la photo Uploadée
-
 function replaceIconByUpload(input) {
   document.getElementById(input).addEventListener('change', function (event) {
     event.preventDefault;
@@ -259,7 +255,6 @@ function replaceIconByUpload(input) {
 }
 
 // Ajouter le projet au moment du clic
-
 function submitForm(form) {
   form.addEventListener('submit', function (e) {
     e.preventDefault();
@@ -268,7 +263,6 @@ function submitForm(form) {
 }
 
 // Transformer la catégorie selectionnée en categoryId
-
 function getCategoryId(categoryName) {
   const categoryMap = {
     Objets: 1,
@@ -280,7 +274,6 @@ function getCategoryId(categoryName) {
 }
 
 // Envoyer le résultat du formulaire au Backend
-
 function addNewProject() {
   const inputFile = document.getElementById('inputFile').files[0];
   const titre = document.getElementById('photoTitle').value;
