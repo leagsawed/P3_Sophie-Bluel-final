@@ -20,9 +20,6 @@ function postLoginInfo() {
       password: event.target.querySelector('[name=password]').value,
     };
     const jsonLogin = JSON.stringify(login);
-    // const headers = {
-    //   'Content-Type': 'application/json',
-    // };
 
     fetchData('users/login/', 'POST', jsonLogin);
   });

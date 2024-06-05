@@ -36,11 +36,10 @@ export async function fetchData(endUrl, method1, body1) {
     if (endUrl === 'users/login/') {
       if (data.token) {
         localStorage.setItem('authToken', data.token);
-        console.log(data.token);
         createModal('Authentification Réussie!');
-        setTimeout(() => {
-          window.location.href = './index.html';
-        }, 2000);
+        // setTimeout(() => {
+        //   window.location.href = './index.html';
+        // }, 2000);
       } else {
         createModal('E-mail ou mot de passe incorrect.');
         throw new Error('E-mail ou mot de passe incorrect.');

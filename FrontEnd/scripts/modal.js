@@ -92,9 +92,14 @@ function displayImagesInModal(data, container) {
     img.alt = item.title;
     img.className = 'gallery-img';
 
-    const deleteIcon = document.createElement('i');
+    const deleteIcon = document.createElement('button');
+    deleteIcon.type = 'button';
+    deleteIcon.ariaLabel = 'Delete';
     deleteIcon.className = 'fa-solid fa-trash-can delete-icon';
-    deleteIcon.onclick = () => deleteProject(item.id);
+
+    deleteIcon.addEventListener('click', (event) => {
+      deleteProject(event, item.id);
+    });
 
     imgWrapper.appendChild(img);
     imgWrapper.appendChild(deleteIcon);
@@ -103,13 +108,13 @@ function displayImagesInModal(data, container) {
 }
 
 // Permet de supprimer un projet de la galerie
-async function deleteProject(id) {
-  // const headers = {
-  //   Authorization: `Bearer ${localStorage.getItem('authToken')}`,
-  // };
+async function deleteProject(event, id) {
+  event.preventDefault(); // Empêche tout comportement par défaut
+  event.stopPropagation(); // Arrête la propagation de l'événement
+
   try {
     const result = await fetchData('works/' + id, 'DELETE');
-
+    createModal('projet supprimé');
     console.log('Project deleted successfully:', result);
   } catch (error) {
     console.error('Error deleting project:', error);
@@ -260,6 +265,7 @@ function submitForm(form) {
   form.addEventListener('submit', function (e) {
     e.preventDefault();
     addNewProject();
+    console.log('projet ajouté');
   });
 }
 
@@ -293,10 +299,6 @@ function addNewProject() {
   }
 
   const categorySelect = getCategoryId(categoryName);
-  // if (!categorySelect) {
-  //   console.error('Catégorie non valide');
-  //   return;
-  // }
 
   console.log('Fichier sélectionné : ', inputFile.name);
   console.log('Titre : ', titre);
@@ -306,10 +308,6 @@ function addNewProject() {
   formData.append('image', inputFile);
   formData.append('title', titre);
   formData.append('category', categorySelect);
-
-  // const headers = {
-  //   Authorization: `Bearer ${localStorage.getItem('authToken')}`,
-  // };
 
   fetchData('works/ ', 'POST', formData);
 }

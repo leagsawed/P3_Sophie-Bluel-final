@@ -456,6 +456,7 @@ footer nav ul {
   right: 0;
   margin: 6px;
   padding: 4px;
+  border: none;
   border-radius: 2px;
   color: white;
   background-color: black;
