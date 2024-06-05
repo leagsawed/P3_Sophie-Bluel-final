@@ -104,12 +104,8 @@ function displayImagesInModal(data, container) {
 
 // Permet de supprimer un projet de la galerie
 async function deleteProject(id) {
-  // const headers = {
-  //   Authorization: `Bearer ${localStorage.getItem('authToken')}`,
-  // };
   try {
     const result = await fetchData('works/' + id, 'DELETE');
-
     console.log('Project deleted successfully:', result);
   } catch (error) {
     console.error('Error deleting project:', error);
@@ -281,22 +277,20 @@ function addNewProject() {
   const categoryName = document.getElementById('photoCategory').value;
 
   if (!inputFile) {
-    console.error('image non sélectionnée');
-    createModal('Veuillez ajouter une image');
+    console.error('Fichier non sélectionné');
     return;
   }
 
   if (!titre) {
-    console.error('titre non défini');
-    createModal('Veuillez définir un titre.');
+    createModal('Veuillez entrer un titre.');
     return;
   }
 
   const categorySelect = getCategoryId(categoryName);
-  // if (!categorySelect) {
-  //   console.error('Catégorie non valide');
-  //   return;
-  // }
+  if (!categorySelect) {
+    console.error('Catégorie non valide');
+    return;
+  }
 
   console.log('Fichier sélectionné : ', inputFile.name);
   console.log('Titre : ', titre);
@@ -306,10 +300,6 @@ function addNewProject() {
   formData.append('image', inputFile);
   formData.append('title', titre);
   formData.append('category', categorySelect);
-
-  // const headers = {
-  //   Authorization: `Bearer ${localStorage.getItem('authToken')}`,
-  // };
 
   fetchData('works/ ', 'POST', formData);
 }

@@ -7,8 +7,6 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 });
 
-// Envoyer les données de connexion fournies par l'utilisateur via un fetch POST
-
 function postLoginInfo() {
   const loginForm = document.getElementById('login-form');
 
@@ -20,9 +18,6 @@ function postLoginInfo() {
       password: event.target.querySelector('[name=password]').value,
     };
     const jsonLogin = JSON.stringify(login);
-    // const headers = {
-    //   'Content-Type': 'application/json',
-    // };
 
     fetchData('users/login/', 'POST', jsonLogin);
   });

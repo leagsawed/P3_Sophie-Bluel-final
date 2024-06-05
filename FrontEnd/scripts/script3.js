@@ -2,58 +2,81 @@ import { createModal } from './modal.js';
 
 let storedData = null;
 
-export async function fetchData(endUrl, method1, body1) {
-  const url = `http://localhost:5678/api/${endUrl}`;
-
-  let headers = {};
+// fonction asynchronne générique de communication avec le Backend
+export async function fetchData(endUrl, method1, headers1, body1) {
+  let token = {
+    Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+  };
 
   if (endUrl === 'users/login/') {
-    headers['Content-Type'] = 'application/json';
-  } else if (method1 === 'POST' || method1 === 'DELETE') {
-    const authToken = localStorage.getItem('authToken');
-    if (authToken) {
-      headers.Authorization = `Bearer ${authToken}`;
-    }
+    headers1 = {
+      'Content-Type': 'application/json',
+    };
+  } else if (
+    (method1 == 'POST' || method1 == 'DELETE') &&
+    localStorage.getItem('authToken') !== null
+  ) {
+    token = {
+      Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+    };
   }
-
+  let url = 'http://localhost:5678/api/' + endUrl;
   const config = {
     method: method1,
-    headers: headers,
+    headers: headers1,
     body: method1 === 'POST' ? body1 : undefined,
   };
 
+  // comportement de la fonction sur le reste du site
   try {
-    const response = await fetch(url, config);
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(
-        `HTTP error! status: ${response.status}, Message: ${errorText}`
-      );
-    }
-
-    const data = await response.json(); // Suppose we can always expect JSON for simplicity
-
-    if (endUrl === 'users/login/') {
-      if (data.token) {
-        localStorage.setItem('authToken', data.token);
-        console.log(data.token);
-        createModal('Authentification Réussie!');
-        setTimeout(() => {
-          window.location.href = './index.html';
-        }, 2000);
-      } else {
-        createModal('E-mail ou mot de passe incorrect.');
-        throw new Error('E-mail ou mot de passe incorrect.');
-      }
-    }
-
-    return data; // Toujours retourner data pour d'autres utilisations
+    const response = await fetch(url, config)
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        } else {
+          if (endUrl === 'users/login/') {
+            throw new Error("Erreur d'authentification");
+          } else {
+            const errorData = response.text();
+            throw new Error(
+              `HTTP error! status: ${response.status}, Message: ${errorData}`
+            );
+          }
+        }
+      })
+      .then((data) => {
+        // si (login.email == 'sophie.bluel@test.tld' && login.password == 'S0phie')
+        if (endUrl === 'users/login/') {
+          if (data.token) {
+            localStorage.setItem('authToken', data.token);
+            createModal('Authentification Réussie!');
+            setTimeout(() => {
+              window.location.href = './index.html';
+            }, 2000);
+          } else {
+            createModal('E-mail ou mot de passe incorrect.');
+          }
+        } else if (contentType && contentType.includes('application/json')) {
+          const data = response.json();
+          console.log('Success:', data);
+          return data;
+        } else {
+          console.log('No JSON content, success:', response.statusText);
+          return response.statusText;
+        }
+      })
+      .catch((error) => {
+        if (endUrl === 'users/login/') {
+          console.error('Login Failed:', error);
+          createModal('E-mail ou mot de passe incorrect. Veuillez Réessayer.');
+        } else {
+          console.error('Fetch error:', error);
+          throw error;
+        }
+      });
   } catch (error) {
     console.error('Fetch error:', error);
-    if (endUrl === 'users/login/') {
-      createModal('E-mail ou mot de passe incorrect. Veuillez Réessayer.');
-    }
-    throw error; // Relancer l'erreur pour la gestion d'erreur plus haut dans la chaîne d'appel
+    throw error;
   }
 }
 
