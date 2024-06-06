@@ -31,15 +31,22 @@ export async function fetchData(endUrl, method1, body1) {
       );
     }
 
-    const data = await response.json(); // Suppose we can always expect JSON for simplicity
+    // const data = await response.json();
 
+    let data = null;
+    if (
+      response.headers.get('Content-Type')?.includes('application/json') &&
+      response.status !== 204
+    ) {
+      data = await response.json(); // Parse JSON seulement si c'est approprié
+    }
     if (endUrl === 'users/login/') {
-      if (data.token) {
+      if (data && data.token) {
         localStorage.setItem('authToken', data.token);
         createModal('Authentification Réussie!');
-        // setTimeout(() => {
-        //   window.location.href = './index.html';
-        // }, 2000);
+        setTimeout(() => {
+          window.location.href = './index.html';
+        }, 2000);
       } else {
         createModal('E-mail ou mot de passe incorrect.');
         throw new Error('E-mail ou mot de passe incorrect.');
@@ -62,6 +69,7 @@ async function main() {
     storedData = await fetchData('works/');
     if (storedData) {
       displayProjects(storedData);
+      console.log(storedData);
     }
   } catch (error) {
     console.error('Échec du chargement des projets :', error);
@@ -128,6 +136,14 @@ function setupFilterButtons() {
   });
 }
 
+function getPortfolio() {
+  const portfolioSection = document.getElementById('portfolio');
+  if (!portfolioSection) {
+    console.error('The portfolio section is missing from the page.');
+    return;
+  }
+}
+
 // Création d'un bouton
 function createButton(id, text) {
   const button = document.createElement('button');
@@ -189,6 +205,8 @@ document.addEventListener('DOMContentLoaded', function () {
     loginButton.style.fontWeight = 'bold';
   }
 });
+
+document.addEventListener('DOMContentLoaded', getPortfolio);
 
 // Initialisation de l'application
 setupFilterButtons();

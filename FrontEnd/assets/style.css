@@ -396,8 +396,16 @@ footer nav ul {
   margin: 15% auto;
   padding: 20px;
   width: 45%;
-  min-width: 500px;
   border-radius: 10px;
+}
+
+#modalId .modal-content {
+  min-width: 500px;
+}
+
+#modalPopUp .modal-content {
+  width: 30%;
+  min-width: 400px;
 }
 
 .close {

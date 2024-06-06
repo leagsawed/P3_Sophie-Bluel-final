@@ -1,7 +1,9 @@
-import { storedData } from './script.js';
+// import { storedData } from './script.js';
 import { fetchData } from './script.js';
 
 export { createModal, setupContentGalleryModal };
+
+let storedData = null;
 
 // Crée une fenêtre modale
 function createModal(message) {
@@ -98,7 +100,9 @@ function displayImagesInModal(data, container) {
     deleteIcon.className = 'fa-solid fa-trash-can delete-icon';
 
     deleteIcon.addEventListener('click', (event) => {
-      deleteProject(event, item.id);
+      event.preventDefault(); // Empêche tout comportement par défaut
+      event.stopPropagation(); // Arrête la propagation de l'événement
+      deleteProject(item.id);
     });
 
     imgWrapper.appendChild(img);
@@ -108,14 +112,36 @@ function displayImagesInModal(data, container) {
 }
 
 // Permet de supprimer un projet de la galerie
-async function deleteProject(event, id) {
-  event.preventDefault(); // Empêche tout comportement par défaut
-  event.stopPropagation(); // Arrête la propagation de l'événement
-
+async function deleteProject(id) {
   try {
     const result = await fetchData('works/' + id, 'DELETE');
-    createModal('projet supprimé');
+    createModal('projet supprimé avec succès');
     console.log('Project deleted successfully:', result);
+
+    setTimeout(() => {
+      deleteModal('modalPopUp');
+    }, 1100);
+
+    const container = document.querySelector('.image-container');
+    clearGalleryModal();
+    await fetchProjects();
+    displayImagesInModal(storedData, container);
+  } catch (error) {
+    console.error('Error deleting project:', error);
+  }
+}
+
+async function fetchProjects() {
+  try {
+    storedData = await fetchData('works/', 'GET');
+  } catch (error) {
+    console.error('Failed to fetch projects:', error);
+  }
+}
+
+function clearGalleryModal() {
+  try {
+    document.querySelectorAll('.img-wrapper').forEach((div) => div.remove());
   } catch (error) {
     console.error('Error deleting project:', error);
   }
@@ -138,6 +164,7 @@ function displayFormInModal() {
   mainContainer.appendChild(returnBtn);
   returnBtn.addEventListener('click', () => {
     modalContent.removeChild(mainContainer);
+
     setupContentGalleryModal(storedData);
   });
 
@@ -266,6 +293,11 @@ function submitForm(form) {
     e.preventDefault();
     addNewProject();
     console.log('projet ajouté');
+    createModal('Projet ajouté avec succès!');
+
+    setTimeout(() => {
+      window.location.reload();
+    }, 1100);
   });
 }
 

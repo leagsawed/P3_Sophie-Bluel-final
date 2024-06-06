@@ -29,7 +29,7 @@ function setupLogout() {
   login.innerHTML = 'logout';
   login.onclick = () => {
     localStorage.removeItem('authToken');
-    window.location.href = '/FrontEnd/index.html';
+    window.location.href = './index.html';
   };
 }
 //comportement du bouton modifier

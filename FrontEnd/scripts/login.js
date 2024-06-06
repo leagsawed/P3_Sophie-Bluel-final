@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 function postLoginInfo() {
   const loginForm = document.getElementById('login-form');
+  if (!loginForm) return;
 
   loginForm.addEventListener('submit', function (event) {
     event.preventDefault();
@@ -21,7 +22,16 @@ function postLoginInfo() {
     };
     const jsonLogin = JSON.stringify(login);
 
-    fetchData('users/login/', 'POST', jsonLogin);
+    fetchData('users/login/', 'POST', jsonLogin)
+      .then((data) => {
+        if (data && data.token) {
+          // Gestion de la réussite de la connexion
+        }
+      })
+      .catch((error) => {
+        console.error('Login failed:', error);
+        createModal('Erreur de connexion');
+      });
   });
 }
 
