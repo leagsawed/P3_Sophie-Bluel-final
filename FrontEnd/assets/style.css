@@ -430,7 +430,7 @@ footer nav ul {
   font-family: 'Work Sans';
   font-weight: lighter;
   font-size: 24px;
-  margin: 8% 0;
+  margin: 8% 15%;
 }
 
 .image-container {
@@ -444,7 +444,7 @@ footer nav ul {
 }
 
 .img-wrapper {
-  width: 90px;
+  width: 100px;
   height: auto;
 
   position: relative;

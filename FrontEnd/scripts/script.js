@@ -31,8 +31,6 @@ export async function fetchData(endUrl, method1, body1) {
       );
     }
 
-    // const data = await response.json();
-
     let data = null;
     if (
       response.headers.get('Content-Type')?.includes('application/json') &&
@@ -57,7 +55,7 @@ export async function fetchData(endUrl, method1, body1) {
   } catch (error) {
     console.error('Fetch error:', error);
     if (endUrl === 'users/login/') {
-      createModal('E-mail ou mot de passe incorrect. Veuillez Réessayer.');
+      createModal('Veuillez entrer un e-mail et un mot de passe valide.');
     }
     throw error; // Relancer l'erreur pour la gestion d'erreur plus haut dans la chaîne d'appel
   }
@@ -81,14 +79,18 @@ async function main() {
 
 // Affichage des projets dans la galerie
 function displayProjects(data) {
-  const displayedProjectIds = new Set();
-  data.forEach((item) => {
-    if (!displayedProjectIds.has(item.id)) {
-      const project = makeProject(item);
-      appendProjectToGallery(project);
-      displayedProjectIds.add(item.id);
-    }
-  });
+  const gallery = document.querySelector('.gallery');
+  if (data && data.length > 0) {
+    const displayedProjectIds = new Set();
+    data.forEach((item) => {
+      if (!displayedProjectIds.has(item.id)) {
+        const project = makeProject(item);
+        // appendProjectToGallery(project);
+        gallery.appendChild(project);
+        displayedProjectIds.add(item.id);
+      }
+    });
+  }
 }
 
 // Création d'un élément de projet pour l'affichage
@@ -108,18 +110,14 @@ function makeProject(item) {
 }
 
 // Ajout du projet à la galerie
-function appendProjectToGallery(figure) {
-  const gallery = document.querySelector('.gallery');
-  gallery.appendChild(figure);
-}
+// function appendProjectToGallery(figure) {
+//   const gallery = document.querySelector('.gallery');
+//   gallery.appendChild(figure);
+// }
 
 // Configuration des boutons de filtre
 function setupFilterButtons() {
   const portfolioSection = document.getElementById('portfolio');
-  if (!portfolioSection) {
-    console.error('The portfolio section is missing from the page.');
-    return;
-  }
 
   const gallery = portfolioSection.querySelector('.gallery');
   const filterMenu = document.createElement('div');
@@ -134,14 +132,6 @@ function setupFilterButtons() {
     );
     filterMenu.appendChild(button);
   });
-}
-
-function getPortfolio() {
-  const portfolioSection = document.getElementById('portfolio');
-  if (!portfolioSection) {
-    console.error('The portfolio section is missing from the page.');
-    return;
-  }
 }
 
 // Création d'un bouton
@@ -183,7 +173,8 @@ function resetButtonStyle() {
 
 // Nettoyage de la galerie
 function clearGallery() {
-  document.querySelectorAll('figure').forEach((figure) => figure.remove());
+  const portfolio = document.getElementById('portfolio');
+  portfolio.querySelectorAll('figure').forEach((figure) => figure.remove());
 }
 
 // Filtrage des données selon la catégorie
@@ -206,10 +197,15 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 });
 
-document.addEventListener('DOMContentLoaded', getPortfolio);
-
 // Initialisation de l'application
-setupFilterButtons();
-main();
+function init() {
+  const portfolio = document.getElementById('portfolio');
+  if (portfolio) {
+    setupFilterButtons();
+    main();
+  }
+}
 
-export { storedData };
+document.addEventListener('DOMContentLoaded', init);
+
+export { storedData, clearGallery, displayProjects };

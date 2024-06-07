@@ -22,16 +22,16 @@ function postLoginInfo() {
     };
     const jsonLogin = JSON.stringify(login);
 
-    fetchData('users/login/', 'POST', jsonLogin)
-      .then((data) => {
-        if (data && data.token) {
-          // Gestion de la réussite de la connexion
-        }
-      })
-      .catch((error) => {
-        console.error('Login failed:', error);
-        createModal('Erreur de connexion');
-      });
+    fetchData('users/login/', 'POST', jsonLogin);
+    // .then((data) => {
+    //   if (data && data.token) {
+    //     // Gestion de la réussite de la connexion
+    //   }
+    // })
+    // .catch((error) => {
+    //   console.error('Login failed:', error);
+    //   createModal('Erreur de connexion');
+    // });
   });
 }
 

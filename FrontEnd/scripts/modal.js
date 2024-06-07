@@ -1,12 +1,13 @@
-// import { storedData } from './script.js';
-import { fetchData } from './script.js';
+//modal.js
 
-export { createModal, setupContentGalleryModal };
+import { fetchData, clearGallery, displayProjects } from './script.js';
+
+export { createModal, setupContentGalleryModal, updateGallery };
 
 let storedData = null;
 
 // Crée une fenêtre modale
-function createModal(message) {
+function createModal(message, update) {
   const modal = document.createElement('div');
   modal.className = 'modal';
   const modalContent = document.createElement('div');
@@ -17,8 +18,13 @@ function createModal(message) {
   if (!message) {
     modal.id = 'modalId';
 
-    closeBtn.addEventListener('click', () => {
+    closeBtn.addEventListener('click', async () => {
       deleteModal('modalId');
+      // window.location.reload();
+      await updateGallery();
+      if (update) {
+        await update();
+      }
     });
   } else {
     modal.id = 'modalPopUp';
@@ -53,9 +59,13 @@ function deleteModal(modalId) {
 }
 
 //Met en place la gallerie au sein de la modale
-function setupContentGalleryModal(data) {
+async function setupContentGalleryModal() {
+  await fetchProjects();
+
   const modal = document.getElementById('modalId');
   const modalContent = modal.querySelector('.modal-content');
+
+  clearGalleryModal();
 
   const galleryContainer = document.createElement('div');
   galleryContainer.className = 'gallery-container';
@@ -67,7 +77,7 @@ function setupContentGalleryModal(data) {
 
   const imageContainer = document.createElement('div');
   imageContainer.className = 'image-container';
-  displayImagesInModal(data, imageContainer);
+  displayImagesInModal(storedData, imageContainer);
   galleryContainer.appendChild(imageContainer);
 
   const addButton = document.createElement('button');
@@ -115,25 +125,45 @@ function displayImagesInModal(data, container) {
 async function deleteProject(id) {
   try {
     const result = await fetchData('works/' + id, 'DELETE');
-    createModal('projet supprimé avec succès');
     console.log('Project deleted successfully:', result);
+    await fetchProjects();
+
+    const container = document.querySelector('.image-container');
+    clearGalleryModal();
+    displayImagesInModal(storedData, container);
+
+    createModal('projet supprimé avec succès', async () => {
+      await updateGallery();
+    });
 
     setTimeout(() => {
       deleteModal('modalPopUp');
     }, 1100);
-
-    const container = document.querySelector('.image-container');
-    clearGalleryModal();
-    await fetchProjects();
-    displayImagesInModal(storedData, container);
   } catch (error) {
     console.error('Error deleting project:', error);
   }
 }
 
+async function updateGallery() {
+  try {
+    const updatedData = await fetchData('works/', 'GET'); // Assurez-vous que fetchData peut gérer GET
+    if (updatedData) {
+      storedData = updatedData;
+      clearGallery();
+      displayProjects(updatedData);
+    }
+  } catch (error) {
+    console.error('Failed to update gallery:', error);
+  }
+}
+
 async function fetchProjects() {
   try {
-    storedData = await fetchData('works/', 'GET');
+    const newData = await fetchData('works/', 'GET');
+    if (newData) {
+      storedData = newData; // Assurez-vous de mettre à jour storedData
+      console.log('Data successfully fetched and updated.');
+    }
   } catch (error) {
     console.error('Failed to fetch projects:', error);
   }
@@ -292,12 +322,6 @@ function submitForm(form) {
   form.addEventListener('submit', function (e) {
     e.preventDefault();
     addNewProject();
-    console.log('projet ajouté');
-    createModal('Projet ajouté avec succès!');
-
-    setTimeout(() => {
-      window.location.reload();
-    }, 1100);
   });
 }
 
@@ -323,18 +347,22 @@ function addNewProject() {
     createModal('Veuillez ajouter une image');
     return;
   }
-
   if (!titre) {
     console.error('titre non défini');
     createModal('Veuillez définir un titre.');
     return;
   }
 
-  const categorySelect = getCategoryId(categoryName);
+  if (inputFile && titre) {
+    console.log('projet ajouté');
+    createModal('Projet ajouté avec succès');
 
-  console.log('Fichier sélectionné : ', inputFile.name);
-  console.log('Titre : ', titre);
-  console.log('Catégorie : ', categorySelect);
+    setTimeout(() => {
+      window.location.reload();
+    }, 1100);
+  }
+
+  const categorySelect = getCategoryId(categoryName);
 
   const formData = new FormData();
   formData.append('image', inputFile);

@@ -1,5 +1,11 @@
+//loggedIn.js
+
 //Comportement de l'état "Logged in"
-import { createModal, setupContentGalleryModal } from './modal.js';
+import {
+  createModal,
+  setupContentGalleryModal,
+  updateGallery,
+} from './modal.js';
 import { storedData } from './script.js';
 
 const token = localStorage.getItem('authToken');
@@ -41,8 +47,9 @@ function createModifyButton() {
   );
 
   button.addEventListener('click', function () {
-    createModal();
-    setupContentGalleryModal(storedData);
+    createModal(null, updateGallery);
+    updateGallery();
+    setupContentGalleryModal();
   });
 
   return button;
