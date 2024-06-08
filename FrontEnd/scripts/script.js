@@ -67,7 +67,6 @@ async function main() {
     storedData = await fetchData('works/');
     if (storedData) {
       displayProjects(storedData);
-      console.log(storedData);
     }
   } catch (error) {
     console.error('Échec du chargement des projets :', error);
@@ -108,12 +107,6 @@ function makeProject(item) {
 
   return figure;
 }
-
-// Ajout du projet à la galerie
-// function appendProjectToGallery(figure) {
-//   const gallery = document.querySelector('.gallery');
-//   gallery.appendChild(figure);
-// }
 
 // Configuration des boutons de filtre
 function setupFilterButtons() {

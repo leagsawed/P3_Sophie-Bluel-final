@@ -20,7 +20,6 @@ function createModal(message, update) {
 
     closeBtn.addEventListener('click', async () => {
       deleteModal('modalId');
-      // window.location.reload();
       await updateGallery();
       if (update) {
         await update();
@@ -110,8 +109,7 @@ function displayImagesInModal(data, container) {
     deleteIcon.className = 'fa-solid fa-trash-can delete-icon';
 
     deleteIcon.addEventListener('click', (event) => {
-      event.preventDefault(); // Empêche tout comportement par défaut
-      event.stopPropagation(); // Arrête la propagation de l'événement
+      event.preventDefault();
       deleteProject(item.id);
     });
 
@@ -125,7 +123,6 @@ function displayImagesInModal(data, container) {
 async function deleteProject(id) {
   try {
     const result = await fetchData('works/' + id, 'DELETE');
-    console.log('Project deleted successfully:', result);
     await fetchProjects();
 
     const container = document.querySelector('.image-container');
@@ -162,7 +159,6 @@ async function fetchProjects() {
     const newData = await fetchData('works/', 'GET');
     if (newData) {
       storedData = newData; // Assurez-vous de mettre à jour storedData
-      console.log('Data successfully fetched and updated.');
     }
   } catch (error) {
     console.error('Failed to fetch projects:', error);
@@ -177,7 +173,7 @@ function clearGalleryModal() {
   }
 }
 
-// Variable déclarée en globale afin de récupérer plus tard l'Url d'un projet uploadé
+// Variable déclarée en global afin de récupérer plus tard l'Url d'un projet uploadé
 let uploadedImgUrl = null;
 
 // Change le contenu de la modale pour afficher le formulaire d'ajout de projet
@@ -354,7 +350,6 @@ function addNewProject() {
   }
 
   if (inputFile && titre) {
-    console.log('projet ajouté');
     createModal('Projet ajouté avec succès');
 
     setTimeout(() => {

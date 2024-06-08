@@ -6,7 +6,6 @@ import {
   setupContentGalleryModal,
   updateGallery,
 } from './modal.js';
-import { storedData } from './script.js';
 
 const token = localStorage.getItem('authToken');
 if (token) {
@@ -48,7 +47,6 @@ function createModifyButton() {
 
   button.addEventListener('click', function () {
     createModal(null, updateGallery);
-    updateGallery();
     setupContentGalleryModal();
   });
 
