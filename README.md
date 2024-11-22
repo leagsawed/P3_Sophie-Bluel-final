@@ -4,40 +4,10 @@
 
 Ce projet est un portfolio professionnel pour Sophie Bluel, architecte d'intérieur. Il présente ses projets et permet une gestion dynamique du contenu via une interface d'administration.
 
-## Fonctionnalités
-
-- 🖼️ Galerie de projets filtrable par catégorie
-- 🔐 Interface d'administration sécurisée
-- ✨ Gestion dynamique des projets (ajout, suppression)
-- 📱 Design responsive
-- 🎨 Interface utilisateur moderne avec modal
-
-## Technologies Utilisées
-
-- HTML5
-- CSS3
-- JavaScript (Vanilla)
-- API RESTful
-
-## Structure du Projet
-
-sophie-bluel/
-├── assets/
-│   ├── icons/
-│   ├── images/
-│   └── style.css
-├── scripts/
-│   ├── login.js
-│   ├── loggedIn.js
-│   ├── modal.js
-│   └── script.js
-├── index.html
-└── login.html
-
 ## Installation
 
 1. Clonez le repository
-git clone [url-du-repo]
+git clone https://github.com/leagsawed/P3_Sophie-Bluel-final.git
 
 2. Lancez le serveur backend (nécessite Node.js)
 cd backend
@@ -69,16 +39,6 @@ Un système de connexion sécurisé permet à l'administrateur d'accéder à l'i
 ### Gestion des Modales
 Les modales permettent d'ajouter ou de supprimer des projets de manière intuitive avec une validation visuelle des actions.
 
-## Performance et Accessibilité
-
-- Images optimisées
-- Contraste vérifié pour l'accessibilité
-- Navigation au clavier supportée
-- Balises ARIA appropriées
-
-## Déploiement
-
-Le site est optimisé pour un déploiement sur n'importe quel serveur web statique.
 
 ## Auteur
 
